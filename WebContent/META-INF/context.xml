@@ -1,0 +1,41 @@
+<Context path="/JSP-BBS-Chat" docBase="www">
+<!-- Mysql用 -->
+<!--
+	<Resource
+		name="jdbc/JSP-BBS-Chat"
+		auth="Container"
+		type="javax.sql.DataSource"
+		driverClassName="com.myslq.jdbc.Driver"
+		loginTimeout="10"
+		validationQuery="SELECT 1 FROM DUAL"
+		maxWait="5000"
+		userName="root"
+		password=""
+		url="jdbc:mysql://localhost:3306/JSP-BBS-Chat" />
+
+	<ResourceLink
+		type="javax.sql.data.DataSource"
+		name="jdbc/JSP-BBS-Chat"
+		global="jdbc/JSP-BBS-Chat" />
+
+-->
+
+<!-- MariaDB用 -->
+	<Resource
+		name="jdbc/JSP-BBS-Chat"
+		auth="Container"
+		type="javax.sql.DataSource"
+		driverClassName="org.mariadb.jdbc.Driver"
+		loginTimeout="10"
+		validationQuery="SELECT 1 FROM DUAL"
+		maxWait="5000"
+		username="root"
+		password=""
+		testOnBorrow="true"
+		url="jdbc:mysql://localhost:3306/userchat"/>
+
+	<ResourceLink
+		type="javax.sql.data.DataSource"
+		name="jdbc/JSP-BBS-Chat"
+		global="jdbc/JSP-BBS-Chat" />
+</Context>
