@@ -1,7 +1,7 @@
+<%@ page import="java.sql.*, javax.sql.*, javax.naming.InitialContext, javax.naming.Context" %>
 <!DOCTYPE html>
 <html>
 <head>
-<%@ page import="java.sql.*, javax.sql.*, javax.naming.InitialContext, javax.naming.Context" %>
 <meta charset="UTF-8">
 </head>
 <body>
