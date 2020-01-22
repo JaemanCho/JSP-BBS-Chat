@@ -36,7 +36,7 @@ public class UserRegisterServlet extends HttpServlet {
 		) {
 			request.getSession().setAttribute("messageType", "エラーメッセージ");
 			request.getSession().setAttribute("messageContent", "すべての内容を入力してください。");
-			response.sendRedirect("join.jps");
+			response.sendRedirect("join.jsp");
 			return;
 		}
 
@@ -44,7 +44,7 @@ public class UserRegisterServlet extends HttpServlet {
 		if(!userPassword1.equals(userPassword2)) {
 			request.getSession().setAttribute("messageType", "エラーメッセージ");
 			request.getSession().setAttribute("messageContent", "パスワードが一致しません。");
-			response.sendRedirect("join.jps");
+			response.sendRedirect("join.jsp");
 			return;
 		}
 
@@ -54,12 +54,12 @@ public class UserRegisterServlet extends HttpServlet {
 		if(result == 1) {
 			request.getSession().setAttribute("messageType", "成功メッセージ");
 			request.getSession().setAttribute("messageContent", "会員登録に成功しました。");
-			response.sendRedirect("index.jps");
+			response.sendRedirect("index.jsp");
 			return;
 		} else {
 			request.getSession().setAttribute("messageType", "エラーメッセージ");
 			request.getSession().setAttribute("messageContent", "すでに存在しているユーザーです");
-			response.sendRedirect("join.jps");
+			response.sendRedirect("join.jsp");
 			return;
 		}
 	}

@@ -67,15 +67,15 @@
 					<tr>
 						<td style="width:200px;"><h5>ID</h5></td>
 						<td><input class="form-control" type="text" id="userID" name="userID" maxlength="20" placeholder="IDを入力してください"></td>
-						<td style="width:200px"><button class="btn btn-primary" onclick="registerChecFunction();" type="button">重複チェック</button></td>
+						<td style="width:200px"><button class="btn btn-primary" onclick="registerCheckFunction();" type="button">重複チェック</button></td>
 					</tr>
 					<tr>
 						<td style="width:200px;"><h5>パスワード</h5></td>
-						<td colspan="2"><input onkeyup="passwordChecFunction();" class="form-control" id="userPassword1" type="password"  name="userPassword1" maxlength="20" placeholder="パスワードを入力してください"></td>
+						<td colspan="2"><input onkeyup="passwordCheckFunction();" class="form-control" id="userPassword1" type="password"  name="userPassword1" maxlength="20" placeholder="パスワードを入力してください"></td>
 					</tr>
 					<tr>
 						<td style="width:200px;"><h5>パスワード確認</h5></td>
-						<td colspan="2"><input onkeyup="passwordChecFunction();" class="form-control" id="userPassword2" type="password"  name="userPassword2" maxlength="20" placeholder="パスワード確認を入力してください"></td>
+						<td colspan="2"><input onkeyup="passwordCheckFunction();" class="form-control" id="userPassword2" type="password"  name="userPassword2" maxlength="20" placeholder="パスワード確認を入力してください"></td>
 					</tr>
 					<tr>
 						<td style="width:200px;"><h5>お名前</h5></td>
@@ -94,7 +94,7 @@
 										<input type="radio" name="userGender" autocomplete="off" value="男性" checked>男性
 									</label>
 									<label class="btn btn-primary">
-										<input type="radio" name="userGender" autocomplete="off" value="女性" checked>女性
+										<input type="radio" name="userGender" autocomplete="off" value="女性">女性
 									</label>
 								</div>
 							</div>
@@ -104,9 +104,111 @@
 						<td style="width:200px;"><h5>メールアドレス</h5></td>
 						<td colspan="2"><input class="form-control" id="userEmail" type="email"  name="userEmail" maxlength="20" placeholder="メールアドレスを入力してください"></td>
 					</tr>
+					<tr>
+						<td	style="text-align: left;" colspan="3">
+							<h5 style="color: red" id="passwordCheckMassage"></h5>
+							<input class="btn btn-primary pull-right" type="submit" value="登録" />
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</form>
 	</div>
+	<%
+		String messageContent = null;
+		if(session.getAttribute("messageContent") != null) {
+			messageContent = (String) session.getAttribute("messageContent");
+		}
+
+		String messageType = null;
+		if(session.getAttribute("messageType") != null) {
+			messageType = (String) session.getAttribute("messageType");
+		}
+
+		if(messageContent != null) {
+
+	%>
+	<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="vertical-alignment-helper">
+			<div class="modal-dialog vertical-align-center">
+				<div class="modal-content <% if(messageType.equals("エラーメッセージ")) out.println("panel-warning"); else out.println("panel-success"); %>">
+					<div class="modal-header panel-heading">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h4 class="modal-title"><%= messageType %></h4>
+					</div>
+					<div class="modal-body">
+						<%= messageContent %>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">確認</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+	</div><!-- /.modal -->
+	<script>
+		$('#messageModal').modal('show');
+	</script>
+	<%
+			session.removeAttribute("messageContent");
+			session.removeAttribute("messageType");
+		}
+	%>
+	<div class="modal fade" id="checkModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="vertical-alignment-helper">
+			<div class="modal-dialog vertical-align-center">
+				<div id="checkType" class="modal-content panel-info">
+					<div class="modal-header panel-heading">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h4 class="modal-title">
+							確認メッセージ
+						</h4>
+					</div>
+					<div id="checkMessage" class="modal-body">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">確認</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+	</div><!-- /.modal -->
+
+	<script type="text/javascript">
+		function registerCheckFunction() {
+			var userID = $('#userID').val();
+			$.ajax({
+				type: 'POST',
+				url: '/UserRegisterCheckServlet',
+				data: {userID: userID},
+				success: function(result) {
+					if(result == 1) {
+						$('#checkMessage').html('使用可能なIDです。');
+						$('#checkType').attr('class', 'modal-content panel-success');
+					} else {
+						$('#checkMessage').html('使用できないIDです。');
+						$('#checkType').attr('class', 'modal-content panel-warning');
+					}
+					$('#checkModal').modal('show');
+				}
+			});
+		}
+
+		function passwordCheckFunction() {
+			var userPassword1 = $('#userPassword1').val();
+			var userPassword2 = $('#userPassword2').val();
+			if(userPassword1 != userPassword2) {
+				$('#passwordCheckMassage').html('パスワードが一致しません。');
+			} else {
+				$('#passwordCheckMassage').html('');
+			}
+		}
+	</script>
 </body>
 </html>
