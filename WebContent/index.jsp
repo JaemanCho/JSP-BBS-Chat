@@ -39,7 +39,7 @@
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">参加する<span class="caret"></span></a>
 			          <ul class="dropdown-menu">
 			            <li><a href="login.jsp">ログイン</a></li>
-			            <li><a href="join.jsp">新規登録</a></li>
+			            <li><a href="join.jsp">会員登録</a></li>
 			          </ul>
 			        </li>
        			</ul>

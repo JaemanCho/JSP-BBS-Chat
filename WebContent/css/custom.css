@@ -1,0 +1,38 @@
+@import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+@import url(https://fonts.googleapis.com/earlyaccess/hanna.css);
+@import url(https://fonts.googleapis.com/earlyaccess/notosansjp.css);
+* {
+	font-family: 'Nanum Gothic';
+}
+h5 {
+	font-family: 'Noto Sans JP';
+	font-size: 15px;
+}
+h4 {
+	font-family: 'Noto Sans JP';
+}
+h3 {
+	font-family: 'Hanna';
+}
+h2 {
+	font-family: 'Hanna';
+}
+h1 {
+	font-family: 'Hanna';
+}
+/* テーブル */
+thead th {
+	background-color: #006DCC;
+	color: white;
+	text-align: center;
+}
+tr td:first-child,
+tr th:first-child {
+	border-top-left-radius:6px;
+	border-bottom-left-radius:6px;
+}
+tr td:last-child,
+tr th:last-child {
+	border-top-right-radius:6px;
+	border-bottom-right-radius:6px;
+}
