@@ -34,44 +34,6 @@
 	<title>会員制チャットシステム</title>
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="js/bootstrap.js"></script>
-	<script type="text/javascript">
-		function autoClosingAlert(selector, delay) {
-
-			var alert = $(selector).alert();
-
-			alert.show();
-
-			window.setTimeout(function(){
-				alert.hide();
-			}, delay);
-		}
-
-		function submitFunction() {
-			var fromID = '<%= userID %>';
-			var toID = '<%= toID %>';
-			var chatContent = $('#chatContent').val();
-
-			$.ajax({
-				type: 'POST',
-				url: './chatSubmitServlet',
-				data: {
-					fromID: encodeURIComponent(fromID),
-					toID: encodeURIComponent(toID),
-					chatContent: encodeURIComponent(chatContent)
-				},
-				success: function(result) {
-					if(result == 1) {
-						autoClosingAlert('#successMessage', 2000);
-					} else if(result == 0) {
-						autoClosingAlert('#dangerMessage', 2000);
-					} else {
-						autoClosingAlert('#warningMessage', 2000);
-					}
-				}
-			});
-			$('#chatContent').val('');
-		}
-	</script>
 </head>
 <body>
 	<nav class="navbar navbar-default">
@@ -131,17 +93,19 @@
 			 	</div>
 		 	</div>
 		 </div>
+
+	 	<div class="alert alert-success" id="successMessage" style="display: none;">
+			<strong>メッセージ送信が成功しました。</strong>
+		</div>
+		<div class="alert alert-danger" id="dangerMessage" style="display: none;">
+			<strong>お名前と内容を入力してください。</strong>
+		</div>
+		<div class="alert alert-warning" id="warningMessage" style="display: none;">
+			<strong>データベースエラーは発生しました。</strong>
+		</div>
 	</div>
 
-	<div class="alert alert-success" id="successMessage" style="display: none;">
-		<strong>メッセージ送信が成功しました。</strong>
-	</div>
-	<div class="alert alert-danger" id="dangerMessage" style="display: none;">
-		<strong>お名前と内容を入力してください。</strong>
-	</div>
-	<div class="alert alert-warning" id="warningMessage" style="display: none;">
-		<strong>データベースエラーは発生しました。</strong>
-	</div>
+
 
 	<%
 		String messageContent = null;
@@ -186,5 +150,118 @@
 			session.removeAttribute("messageType");
 		}
 	%>
+
+<script type="text/javascript">
+	// alert効果処理
+	function autoClosingAlert(selector, delay) {
+
+		var alert = $(selector).alert();
+
+		alert.show();
+
+		window.setTimeout(function(){
+			alert.hide();
+		}, delay);
+	}
+
+	// 送信処理
+	function submitFunction() {
+		var fromID = '<%= userID %>';
+		var toID = '<%= toID %>';
+		var chatContent = $('#chatContent').val();
+
+		$.ajax({
+			type: 'POST',
+			url: './chatSubmitServlet',
+			data: {
+				fromID: encodeURIComponent(fromID),
+				toID: encodeURIComponent(toID),
+				chatContent: encodeURIComponent(chatContent)
+			},
+			success: function(result) {
+				if(result == 1) {
+					autoClosingAlert('#successMessage', 2000);
+					chatListFunction(lastID);
+				} else if(result == 0) {
+					autoClosingAlert('#dangerMessage', 2000);
+				} else {
+					autoClosingAlert('#warningMessage', 2000);
+				}
+			}
+		});
+		$('#chatContent').val('');
+	}
+
+	// チャット内容の読み込み処理
+	var lastID = 0;
+	function chatListFunction(type) {
+		var fromID = '<%= userID %>';
+		var toID = '<%= toID %>';
+
+		$.ajax({
+			type: 'POST',
+			url: './chatListServlet',
+			data: {
+				fromID: encodeURIComponent(fromID),
+				toID: encodeURIComponent(toID),
+				listType: type
+			},
+			success: function(data) {
+				if(data == "") return;
+				var parsed = JSON.parse(data);
+				var result = parsed.result
+				if(lastID != Number(parsed.last)) {
+					$('#chatList').html('');
+					for (var i = 0; i < result.length; i++) {
+						if(result[i][0].value == fromID) {
+							result[i][0].value = '私';
+						}
+						addChat(result[i][0].value, result[i][2].value, result[i][3].value);
+					}
+				}
+				lastID = Number(parsed.last);
+			}
+		});
+	}
+
+	// チャット内容のレイアウト作成
+	function addChat(chatName, chatContent, chatTime) {
+		$("#chatList").append(
+			'<div class="row">' +
+			'<div class="col-lg-12">' +
+			'<div class="media">' +
+			'<a class="media-left" href="#">' +
+			'<img class="media-object img-circle" style="width: 30px; height: 30px" src="images/icon.png">' +
+			'</a>' +
+			'<div class="media-body">' +
+			'<h4 class="media-heading">' +
+			chatName +
+			'<span class="small pull-right">' +
+			chatTime +
+			'</span>' +
+			'</h4>' +
+			'<p>' +
+			chatContent +
+			'</p' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'<hr>');
+		$('#chatList').scrollTop($('#chatList').get(0).scrollHeight);
+	}
+	// 3秒ごとにメッセージを読み込む
+	function getInfiniteChat() {
+		setInterval(function() {
+			chatListFunction(lastID);
+		}, 3000);
+	}
+
+	// ページ読み込み時メッセージを読み込む
+	$(document).ready(function() {
+		chatListFunction('ten');
+		getInfiniteChat();
+});
+</script>
 </body>
 </html>
