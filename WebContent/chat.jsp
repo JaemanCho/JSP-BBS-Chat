@@ -48,7 +48,8 @@
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       		<ul class="nav navbar-nav">
-      			<li class="active"><a href="index.jp">ホーム</a></li>
+      			<li><a href="index.jsp">ホーム</a></li>
+      			<li><a href="find.jsp">友達検索</a></li>
       		</ul>
       		<%
       			if(userID != null) {
