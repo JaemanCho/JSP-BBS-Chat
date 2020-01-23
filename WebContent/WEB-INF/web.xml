@@ -37,4 +37,12 @@
   	<url-pattern>/chatListServlet</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+	<servlet-name>UserLoginServlet</servlet-name>
+	<servlet-class>user.UserLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>UserLoginServlet</servlet-name>
+  	<url-pattern>/userLogin</url-pattern>
+  </servlet-mapping>
 </web-app>

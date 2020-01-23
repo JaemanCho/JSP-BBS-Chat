@@ -22,9 +22,9 @@ public class ChatSubmitServlet extends HttpServlet {
 		String chatContent = request.getParameter("chatContent");
 
 		if(
-				fromID == null || fromID.equals("") ||
-				toID == null || toID.equals("") ||
-				chatContent == null || chatContent.equals("")
+			fromID == null || fromID.equals("") ||
+			toID == null || toID.equals("") ||
+			chatContent == null || chatContent.equals("")
 
 		) {
 			response.getWriter().write("0");

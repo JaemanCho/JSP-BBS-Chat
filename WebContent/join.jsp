@@ -16,6 +16,13 @@
 		if(session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
 		}
+
+		if(userID != null) {
+			session.setAttribute("messageType", "エラーメッセージ");
+			session.setAttribute("messageContent", "すでにログインしています。");
+			response.sendRedirect("index.jsp");
+			return;
+		}
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -41,14 +48,6 @@
 			            <li><a href="login.jsp">ログイン</a></li>
 			            <li><a href="join.jsp">新規登録</a></li>
 			          </ul>
-			        </li>
-       			</ul>
-    		<%
-      			} else {
-      		%>
-      			<ul class="nav navbar-nav navbar-right">
-					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
 			        </li>
        			</ul>
       		<% } %>

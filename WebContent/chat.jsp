@@ -9,6 +9,20 @@
 	if(request.getParameter("toID") != null) {
 		toID = request.getParameter("toID");
 	}
+
+	if(userID == null) {
+		session.setAttribute("messageType", "エラーメッセージ");
+		session.setAttribute("messageContent", "ログインしてください。");
+		response.sendRedirect("index.jsp");
+		return;
+	}
+
+	if(toID== null) {
+		session.setAttribute("messageType", "エラーメッセージ");
+		session.setAttribute("messageContent", "チャット相手が選択されていません。");
+		response.sendRedirect("index.jsp");
+		return;
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -75,23 +89,14 @@
       			<li class="active"><a href="index.jp">ホーム</a></li>
       		</ul>
       		<%
-      			if(userID == null) {
-    		%>
-    			<ul class="nav navbar-nav navbar-right">
-					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">参加する<span class="caret"></span></a>
-			          <ul class="dropdown-menu">
-			            <li><a href="login.jsp">ログイン</a></li>
-			            <li><a href="join.jsp">会員登録</a></li>
-			          </ul>
-			        </li>
-       			</ul>
-    		<%
-      			} else {
+      			if(userID != null) {
       		%>
       			<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
+			          <ul class="dropdown-menu">
+			            <li><a href="logoutAction.jsp">ログアウト</a></li>
+			          </ul>
 			        </li>
        			</ul>
       		<% } %>
