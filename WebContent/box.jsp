@@ -16,6 +16,14 @@
 		if(session.getAttribute("userID") != null) {
 			userID = (String) session.getAttribute("userID");
 		}
+
+
+		if(userID == null) {
+			session.setAttribute("messageType", "エラーメッセージ");
+			session.setAttribute("messageContent", "ログインしてください。");
+			response.sendRedirect("index.jsp");
+			return;
+		}
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -29,24 +37,12 @@
 		</div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       		<ul class="nav navbar-nav">
-      			<li class="active"><a href="index.jsp">ホーム</a></li>
+      			<li><a href="index.jsp">ホーム</a></li>
       			<li><a href="find.jsp">友達検索</a></li>
-      			<li><a href="box.jsp">メッセージボックス<span id="unread" class="label label-info"></span></a></li>
+      			<li class="active"><a href="box.jsp">メッセージボックス<span id="unread" class="label label-info"></span></a></li>
       		</ul>
       		<%
-      			if(userID == null) {
-    		%>
-    			<ul class="nav navbar-nav navbar-right">
-					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">参加する<span class="caret"></span></a>
-			          <ul class="dropdown-menu">
-			            <li><a href="login.jsp">ログイン</a></li>
-			            <li><a href="join.jsp">会員登録</a></li>
-			          </ul>
-			        </li>
-       			</ul>
-    		<%
-      			} else {
+      			if(userID != null) {
       		%>
       			<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown">
@@ -59,6 +55,21 @@
       		<% } %>
 		</div>
 	</nav>
+		<div class="container">
+		<table class="table" style="margin: 0 auto">
+			<thead>
+				<tr>
+					<th colspan="3"><h4>メッセージ一覧</h4></th>
+				</tr>
+			</thead>
+			<div style="overflow-y: auto; width: 100%; max-height:450px;">
+				<table class="table table-bordered table-hover" style="text-align: center; border: 1px solid #dddddd;">
+					<tbody id="boxTable">
+					</tbody>
+				</table>
+			</div>
+		</table>
+	</div>
 	<%
 		String messageContent = null;
 		if(session.getAttribute("messageContent") != null) {
@@ -111,6 +122,8 @@
 	$(document).ready(function() {
 		getUnread();
 		getInfiniteUnread();
+		getInfiniteBox();
+		chatBoxFunction();
 	});
 
 	<% } %>
@@ -139,6 +152,46 @@
 
 	function showUnread(result) {
 		$('#unread').html(result);
+	}
+
+	function chatBoxFunction() {
+		var userID = <%= userID %>
+		$.ajax({
+			type: 'POST',
+			url: './chatBox',
+			data: {
+				userID: encodeURIComponent(userID),
+			},
+			success: function(data) {
+				if(data == '') return;
+				$("#boxTable").html('');
+				var parsed = JSON.parse(data);
+				var result = parsed.result;
+				for (var i = 0; i < result.length; i++) {
+					if(result[i][0].value == userID) {
+						result[i][0].value = result[i][1].value;
+					} else {
+						result[i][1].value = result[i][0].value;
+					}
+					addBox(result[i][0].value, result[i][1].value, result[i][2].value, result[i][3].value, result[i][4].value);
+				}
+			}
+		});
+	}
+	function addBox(lastID, toID, chatContent, chatTime, unread) {
+		$("#boxTable").append('<tr onclick="location.href=\'chat.jsp?toID=' + encodeURIComponent(toID) + '\'">' +
+				'<td style="width: 150px;"><h5>' + lastID + '</h5></td>' +
+				'<td>' +
+				'<h5>' + chatContent +
+				'<span class="label label-info">' + unread + '</span></h5>' +
+				'<div class="pull-right">' + chatTime + '</div>' +
+				'</td>' +
+				'</tr>');
+	}
+	function getInfiniteBox() {
+		setInterval(function() {
+			chatBoxFunction();
+		}, 3000);
 	}
 	</script>
 </body>

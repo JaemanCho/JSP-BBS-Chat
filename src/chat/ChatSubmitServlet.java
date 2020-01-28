@@ -28,6 +28,8 @@ public class ChatSubmitServlet extends HttpServlet {
 
 		) {
 			response.getWriter().write("0");
+		} else if(fromID.equals(toID)) {
+			response.getWriter().write("-1");
 		} else {
 			fromID = URLDecoder.decode(fromID, "UTF-8");
 			toID = URLDecoder.decode(toID, "UTF-8");

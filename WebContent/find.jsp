@@ -38,6 +38,7 @@
       		<ul class="nav navbar-nav">
       			<li><a href="index.jsp">ホーム</a></li>
       			<li class="active"><a href="find.jsp">友達検索</a></li>
+      			<li><a href="box.jsp">メッセージボックス<span id="unread" class="label label-info"></span></a></li>
       		</ul>
       		<%
       			if(userID != null) {
@@ -191,6 +192,43 @@
 			$('#friendResult').html('');
 		}
 	</script>
+	<script type="text/javascript">
+	<%
+		if(userID != null) {
+	%>
 
+	$(document).ready(function() {
+		getUnread();
+		getInfiniteUnread();
+	});
+
+	<% } %>
+	function getUnread() {
+		$.ajax({
+			type: 'POST',
+			url: './chatUnread',
+			data: {
+				userID: encodeURIComponent('<%= userID %>'),
+			},
+			success: function(result) {
+				if (result >= 1) {
+					showUnread(result);
+				} else {
+					showUnread('');
+				}
+			}
+		});
+	}
+
+	function getInfiniteUnread() {
+		setInterval(function() {
+			getUnread();
+		}, 4000);
+	}
+
+	function showUnread(result) {
+		$('#unread').html(result);
+	}
+	</script>
 </body>
 </html>

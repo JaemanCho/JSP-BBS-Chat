@@ -1,3 +1,4 @@
+<%@page import="java.net.URLDecoder"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 	String userID = null;
@@ -20,6 +21,13 @@
 	if(toID== null) {
 		session.setAttribute("messageType", "エラーメッセージ");
 		session.setAttribute("messageContent", "チャット相手が選択されていません。");
+		response.sendRedirect("index.jsp");
+		return;
+	}
+
+	if(userID.equals(URLDecoder.decode(toID, "UTF-8"))) {
+		session.setAttribute("messageType", "エラーメッセージ");
+		session.setAttribute("messageContent", "自分にはチャットができません。");
 		response.sendRedirect("index.jsp");
 		return;
 	}
@@ -50,6 +58,7 @@
       		<ul class="nav navbar-nav">
       			<li><a href="index.jsp">ホーム</a></li>
       			<li><a href="find.jsp">友達検索</a></li>
+      			<li><a href="box.jsp">メッセージボックス<span id="unread" class="label label-info"></span></a></li>
       		</ul>
       		<%
       			if(userID != null) {
@@ -260,9 +269,38 @@
 
 	// ページ読み込み時メッセージを読み込む
 	$(document).ready(function() {
-		chatListFunction('ten');
+		getUnread();
+		chatListFunction('0');
 		getInfiniteChat();
-});
+		getInfiniteUnread();
+	});
+
+	function getUnread() {
+		$.ajax({
+			type: 'POST',
+			url: './chatUnread',
+			data: {
+				userID: encodeURIComponent('<%= userID %>'),
+			},
+			success: function(result) {
+				if (result >= 1) {
+					showUnread(result);
+				} else {
+					showUnread('');
+				}
+			}
+		});
+	}
+
+	function getInfiniteUnread() {
+		setInterval(function() {
+			getUnread();
+		}, 4000);
+	}
+
+	function showUnread(result) {
+		$('#unread').html(result);
+	}
 </script>
 </body>
 </html>
