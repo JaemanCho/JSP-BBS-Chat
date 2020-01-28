@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class ChatUnreadServlet
@@ -24,6 +25,11 @@ public class ChatUnreadServlet extends HttpServlet {
 		if(userID == null || userID.equals("")) {
 			response.getWriter().write("0");
 		} else {
+			HttpSession session = request.getSession();
+			if(!userID.equals((String) session.getAttribute("userID"))) {
+				response.getWriter().write("");
+				return;
+			}
 			response.getWriter().write(new ChatDAO().getAllUnreadChat(userID) + "");
 		}
 	}

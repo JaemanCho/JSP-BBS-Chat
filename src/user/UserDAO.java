@@ -125,4 +125,76 @@ public class UserDAO {
 		// データベースエラー
 		return -1;
 	}
+
+	// 会員情報取得
+	public UserDTO getUser(String userID) {
+		UserDTO user = new UserDTO();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String SQL = "SELECT * FROM USER WHERE userID = ?";
+		try {
+			con = dataSource.getConnection();
+			pstmt = con.prepareStatement(SQL);
+			pstmt.setString(1, userID);
+			rs = pstmt.executeQuery();
+
+			if(rs.next()) {
+				user.setUserID(userID);
+				user.setUserPassword(rs.getString("userPassword"));
+				user.setUserName(rs.getString("userName"));
+				user.setUserAge(rs.getInt("userAge"));
+				user.setUserGender(rs.getString("userGender"));
+				user.setUserEmail(rs.getString("userEmail"));
+				user.setUserProfile(rs.getString("userProfile"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+				if(pstmt != null) pstmt.close();
+				if(con != null) con.close();
+
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+
+		return user;
+	}
+
+	// 編集
+	public int update(String userID, String userPassword, String userName, String userAge, String userGender, String userEmail) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String SQL = "UPDATE USER SET userPassword = ?, userName = ?, userAge = ?, userGender = ?, userEmail = ? WHERE userID = ?";
+		try {
+			con = dataSource.getConnection();
+			pstmt = con.prepareStatement(SQL);
+			pstmt.setString(1, userPassword);
+			pstmt.setString(2, userName);
+			pstmt.setInt(3, Integer.parseInt(userAge));
+			pstmt.setString(4, userGender);
+			pstmt.setString(5, userEmail);
+			pstmt.setString(6, userID);
+
+			return pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+				if(con != null) con.close();
+
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		// データベースエラー
+		return -1;
+	}
+
 }
