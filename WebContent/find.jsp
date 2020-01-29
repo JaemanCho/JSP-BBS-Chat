@@ -48,6 +48,7 @@
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
 			          <ul class="dropdown-menu">
 			          	<li><a href="update.jsp">会員情報編集</a></li>
+			          	<li><a href="profileUpdate.jsp">プロファイル編集</a></li>
 			            <li><a href="logoutAction.jsp">ログアウト</a></li>
 			          </ul>
 			        </li>
@@ -153,19 +154,22 @@
 
 			$.ajax({
 				type: 'POST',
-				url: './UserRegisterCheckServlet',
+				url: './UserFindServlet',
 				data: {
 					userID: userID
 				},
 				success: function(result) {
-					if(result == 0) {
-						$('#checkMessage').html('友達を見つけました。');
-						$('#checkType').attr('class', 'modal-content panel-success');
-						getFriend(userID);
-					} else {
+					if(result == -1) {
 						$('#checkMessage').html('友達がいません。');
 						$('#checkType').attr('class', 'modal-content panel-warning');
 						failFriend();
+					} else {
+
+						$('#checkMessage').html('友達を見つけました。');
+						$('#checkType').attr('class', 'modal-content panel-success');
+						var data = JSON.parse(result);
+						var userProfile = data.userProfile;
+						getFriend(userID, userProfile);
 					}
 					$('#checkModal').modal('show');
 				}
@@ -173,7 +177,7 @@
 		}
 
 		// 検索結果表示
-		function getFriend(findID) {
+		function getFriend(findID, userProfile) {
 			$('#friendResult').html(
 				'<thead>' +
 				'<tr>' +
@@ -182,7 +186,9 @@
 				'</thead>' +
 				'<tbody>' +
 				'<tr>' +
-				'<td style="text-align; center;"><h3>' + findID + '</h3><a href="chat.jsp?toID=' + encodeURIComponent(findID) + '" class="btn btn-primary pull-right">チャットする</a></td>' +
+				'<td style="text-align; center;">' +
+				'<img class="media-object img-crcle" style="max-width; 300px margin:0 auto;" src="' + userProfile + '">' +
+				'<h3>' + findID + '</h3><a href="chat.jsp?toID=' + encodeURIComponent(findID) + '" class="btn btn-primary pull-right">チャットする</a></td>' +
 				'</tr>' +
 				'</tbody>'
 			);

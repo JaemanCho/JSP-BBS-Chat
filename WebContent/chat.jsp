@@ -1,5 +1,6 @@
-<%@page import="java.net.URLDecoder"%>
+<%@ page import="java.net.URLDecoder"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="user.UserDAO" %>
 <%
 	String userID = null;
 	if(session.getAttribute("userID") != null) {
@@ -31,6 +32,9 @@
 		response.sendRedirect("index.jsp");
 		return;
 	}
+
+	String fromProfile = new UserDAO().getProfile(userID);
+	String toProfile = new UserDAO().getProfile(toID);
 %>
 <!DOCTYPE html>
 <html>
@@ -68,6 +72,7 @@
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
 			          <ul class="dropdown-menu">
 			          	<li><a href="update.jsp">会員情報編集</a></li>
+			          	<li><a href="profileUpdate.jsp">プロファイル編集</a></li>
 			            <li><a href="logoutAction.jsp">ログアウト</a></li>
 			          </ul>
 			        </li>
@@ -237,12 +242,19 @@
 
 	// チャット内容のレイアウト作成
 	function addChat(chatName, chatContent, chatTime) {
+		var src = '';
+
+		if(chatName == '私') {
+			src = '<%= fromProfile %>';
+		} else {
+			src = '<%= toProfile %>';
+		}
 		$("#chatList").append(
 			'<div class="row">' +
 			'<div class="col-lg-12">' +
 			'<div class="media">' +
 			'<a class="media-left" href="#">' +
-			'<img class="media-object img-circle" style="width: 30px; height: 30px" src="images/icon.png">' +
+			'<img class="media-object img-circle" style="width: 30px; height: 30px" src="' + src + '">' +
 			'</a>' +
 			'<div class="media-body">' +
 			'<h4 class="media-heading">' +

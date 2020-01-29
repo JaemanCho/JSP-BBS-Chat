@@ -53,6 +53,7 @@
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
 			          <ul class="dropdown-menu">
 			          	<li><a href="update.jsp">会員情報編集</a></li>
+			          	<li><a href="profileUpdate.jsp">プロファイル編集</a></li>
 			            <li><a href="logoutAction.jsp">ログアウト</a></li>
 			          </ul>
 			        </li>

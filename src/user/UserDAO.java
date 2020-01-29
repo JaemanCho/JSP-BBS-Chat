@@ -197,4 +197,65 @@ public class UserDAO {
 		return -1;
 	}
 
+	// プロファイル更新
+	public int profile(String userID, String userProfile) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String SQL = "UPDATE USER SET userProfile= ? WHERE userID = ?";
+		try {
+			con = dataSource.getConnection();
+			pstmt = con.prepareStatement(SQL);
+			pstmt.setString(1, userProfile);
+			pstmt.setString(2, userID);
+			return pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+				if(con != null) con.close();
+
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		// データベースエラー
+		return -1;
+	}
+
+	// イメージパス取得
+	public String getProfile(String userID) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String SQL = "SELECT userProfile FROM USER WHERE userID = ?";
+		try {
+			con = dataSource.getConnection();
+			pstmt = con.prepareStatement(SQL);
+			pstmt.setString(1, userID);
+			rs = pstmt.executeQuery();
+
+			if(rs.next()) {
+				if(rs.getString("userProfile").equals("")) {
+					return "http://localhost:8080/images/icon.png";
+				}
+				return "http://localhost:8080/upload/" + rs.getString("userProfile");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+				if(pstmt != null) pstmt.close();
+				if(con != null) con.close();
+
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+
+		return "http://localhost:8080/images/icon.png";
+	}
 }

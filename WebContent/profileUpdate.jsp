@@ -1,4 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="user.UserDTO" %>
+<%@ page import="user.UserDAO" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,13 +19,14 @@
 			userID = (String) session.getAttribute("userID");
 		}
 
-
 		if(userID == null) {
 			session.setAttribute("messageType", "エラーメッセージ");
 			session.setAttribute("messageContent", "ログインしてください。");
 			response.sendRedirect("index.jsp");
 			return;
 		}
+
+		UserDTO user = new UserDAO().getUser(userID);
 	%>
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
@@ -39,38 +42,58 @@
       		<ul class="nav navbar-nav">
       			<li><a href="index.jsp">ホーム</a></li>
       			<li><a href="find.jsp">友達検索</a></li>
-      			<li class="active"><a href="box.jsp">メッセージボックス<span id="unread" class="label label-info"></span></a></li>
+      			<li><a href="box.jsp">メッセージボックス<span id="unread" class="label label-info"></span></a></li>
       		</ul>
-      		<%
-      			if(userID != null) {
-      		%>
-      			<ul class="nav navbar-nav navbar-right">
-					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
-			          <ul class="dropdown-menu">
-			          	<li><a href="update.jsp">会員情報編集</a></li>
-			          	<li><a href="profileUpdate.jsp">プロファイル編集</a></li>
-			            <li><a href="logoutAction.jsp">ログアウト</a></li>
-			          </ul>
-			        </li>
-       			</ul>
-      		<% } %>
+  			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+		          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">会員管理<span class="caret"></span></a>
+		          <ul class="dropdown-menu">
+		          	<li><a href="update.jsp">会員情報編集</a></li>
+		          	<li class="active"><a href="profileUpdate.jsp">プロファイル編集</a></li>
+		            <li><a href="logoutAction.jsp">ログアウト</a></li>
+		          </ul>
+		        </li>
+  			</ul>
 		</div>
 	</nav>
-		<div class="container">
-		<table class="table" style="margin: 0 auto">
-			<thead>
-				<tr>
-					<th colspan="3"><h4>メッセージ一覧</h4></th>
-				</tr>
-			</thead>
-			<div style="overflow-y: auto; width: 100%; max-height:450px;">
-				<table class="table table-bordered table-hover" style="text-align: center; border: 1px solid #dddddd;">
-					<tbody id="boxTable">
-					</tbody>
-				</table>
-			</div>
-		</table>
+
+	<div class="container">
+		<form method="post" action="./userProfile" enctype="multipart/form-data">
+			<table class="table table-bordered table-hover" style="text-align: center; border: 1px solid #dddddd;">
+				<thead>
+					<tr>
+						<th colspan="2"><h4>プロファイル編集</h4></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style="width:200px;"><h5>ID</h5></td>
+						<td><h5><%= userID %></h5>
+						<input type="hidden" name="userID" value="<%= userID %>" /></td>
+					</tr>
+
+					<tr>
+						<td style="width:200px;"><h5>イメージファイル</h5></td>
+						<td colspan="2">
+							<input type="file" name="userProfile" class="file">
+							<div class="input-group col-xs-12">
+								<span class="input-group-addon"><i class="glyphicon glyphicon-picture"></i></span>
+								<input type="text" class="form-control input-lg" disabled placeholder="アップロードしてください。">
+								<span class="input-group-btn">
+									<button class="browse btn btn-primary input-lg" type="button"><i class="glyphicon glyphiocn-search"></i>ファイル</button>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td	style="text-align: left;" colspan="3">
+							<h5 style="color: red" id="passwordCheckMassage"></h5>
+							<input class="btn btn-primary pull-right" type="submit" value="登録" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
 	</div>
 	<%
 		String messageContent = null;
@@ -124,8 +147,6 @@
 	$(document).ready(function() {
 		getUnread();
 		getInfiniteUnread();
-		getInfiniteBox();
-		chatBoxFunction();
 	});
 
 	<% } %>
@@ -156,47 +177,24 @@
 		$('#unread').html(result);
 	}
 
-	function chatBoxFunction() {
-		var userID = <%= userID %>
-		$.ajax({
-			type: 'POST',
-			url: './chatBox',
-			data: {
-				userID: encodeURIComponent(userID),
-			},
-			success: function(data) {
-				if(data == '') return;
-				$("#boxTable").html('');
-				var parsed = JSON.parse(data);
-				var result = parsed.result;
-				for (var i = 0; i < result.length; i++) {
-					if(result[i][0].value == userID) {
-						result[i][0].value = result[i][1].value;
-					} else {
-						result[i][1].value = result[i][0].value;
-					}
-					addBox(result[i][0].value, result[i][1].value, result[i][2].value, result[i][3].value, result[i][4].value, result[i][5].value);
-				}
-			}
-		});
-	}
-	function addBox(lastID, toID, chatContent, chatTime, unread, userProfile) {
-		$("#boxTable").append('<tr onclick="location.href=\'chat.jsp?toID=' + encodeURIComponent(toID) + '\'">' +
-				'<td style="width: 150px;">' +
-				'<img class="media-object img-circle" style="margin: 0 auto; max-width: 40px; max-height: 40px;" src="' + userProfile +'">' +
-				'<h5>' + lastID + '</h5></td>' +
-				'<td>' +
-				'<h5>' + chatContent +
-				'<span class="label label-info">' + unread + '</span></h5>' +
-				'<div class="pull-right">' + chatTime + '</div>' +
-				'</td>' +
-				'</tr>');
-	}
-	function getInfiniteBox() {
-		setInterval(function() {
-			chatBoxFunction();
-		}, 3000);
+	function passwordCheckFunction() {
+		var userPassword1 = $('#userPassword1').val();
+		var userPassword2 = $('#userPassword2').val();
+		if(userPassword1 != userPassword2) {
+			$('#passwordCheckMassage').html('パスワードが一致しません。');
+		} else {
+			$('#passwordCheckMassage').html('');
+		}
 	}
 	</script>
-</body>
+	<script type="text/javascript">
+		$(document).on('click', '.browse', function() {
+			var file = $(this).parent().parent().parent().find('.file');
+			file.trigger('click');
+		});
+		$(document).on('change', '.file', function() {
+			$(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+		})
+	</script>
+	</body>
 </html>
